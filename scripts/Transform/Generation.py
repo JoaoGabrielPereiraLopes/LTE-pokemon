@@ -1,6 +1,11 @@
 import sqlite3 as sql3
 import pandas as pd
+import os
 
+caminho_arquivo = os.path.join('../../database', 'Pokemon.csv')
+
+# Caminho absoluto para o arquivo
+caminho_absoluto = os.path.abspath(caminho_arquivo)
 class Generation:
     
     def __init__(self, numbers, pokemons, legendarys, execute=True) -> None:
@@ -26,22 +31,19 @@ class Generation:
         return self.cursor.fetchall()
 
 
-def registrador():
+def registrador_generation():
     # Carregar os dados do arquivo CSV
-    dados = pd.read_csv('C:/Users/gabri/Downloads/LTE-POKEMON-main/database/Pokemon.csv')
+    dados = pd.read_csv(caminho_absoluto)
     generations = dados['Generation'].unique()  # Gera uma lista das gerações únicas
 
     for x in range(1,len(generations)+1):
         # Filtrando pokémons de cada geração
-        pokemons = dados.loc[dados['Generation'] == x]
-        
+        pokemons = dados.loc[dados['Generation'] == x][~dados['Name'].str.contains('Mega ', case=False, na=False)]
         # Filtrando pokémons lendários de cada geração
-        lendario = dados.loc[dados['Generation'] == x]
-        lendario = lendario[lendario['Legendary'] == True]  # Filtra apenas os lendários
+        lendario = dados.loc[dados['Generation'] == x][~dados['Name'].str.contains('Mega ', case=False, na=False)]
+        lendario = lendario[lendario['Legendary'] == True][~dados['Name'].str.contains('Mega ', case=False, na=False)]  # Filtra apenas os lendários
 
         # Criando o objeto Generation e inserindo dados no banco
         generaton_obj = Generation(x, len(pokemons), len(lendario))
         # Fechando o objeto após a inserção
         generaton_obj.close()
-
-registrador()

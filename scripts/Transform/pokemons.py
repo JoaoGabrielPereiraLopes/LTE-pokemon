@@ -1,5 +1,11 @@
 import sqlite3 as sql3
 import pandas as pd
+import os
+
+caminho_arquivo = os.path.join('../../database', 'Pokemon.csv')
+
+# Caminho absoluto para o arquivo
+caminho_absoluto = os.path.abspath(caminho_arquivo)
 
 class Pokemon:
     def __init__(self, dictionary):
@@ -38,7 +44,7 @@ class Pokemon:
 
 def registra_pk():
     # Carregar o arquivo CSV
-    dados = pd.read_csv('C:/Users/gabri/Downloads/LTE-POKEMON-main/database/Pokemon.csv')
+    dados = pd.read_csv(caminho_absoluto)
 
     # Filtrar os dados onde o nome contém 'Mega' (ignorando maiúsculas/minúsculas)
     dados_mega = dados[~dados['Name'].str.contains('Mega ', case=False, na=False)]
@@ -64,6 +70,3 @@ def registra_pk():
         Pokemon(registro)
 
     print("Registros concluídos com sucesso!")
-
-# Executar a função
-registra_pk()
