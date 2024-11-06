@@ -1,12 +1,6 @@
 import sqlite3 as sql3
 import pandas as pd
-import os
-
-import sqlite3 as sql3
-import pandas as pd
-
 class Type:
-    
     def __init__(self, nome, executar=True) -> None:
         # Conectar ao banco de dados
         conexao = sql3.connect('../../database/pokemon.db')
@@ -18,7 +12,7 @@ class Type:
             conexao.commit()  # Commit para garantir que a alteração seja salva no banco de dados
         
         self.conexao = conexao  # Guardando a conexão para usar depois
-    
+        
     def select(self, campos, verificacoes):
         # Consultar no banco de dados
         self.cursor.execute(f"SELECT {campos} FROM type WHERE {verificacoes}")
@@ -29,8 +23,9 @@ class Type:
         self.conexao.close()
 
 def registrador():
+    
     # Ler o arquivo CSV com pandas
-    dados = pd.read_csv('/mnt/c/Users/labcaxias/Documents/DS202/BD/LTE-pokemon/database/Pokemon.csv')
+    dados = pd.read_csv('C:/Users/Asafe/Documents/LTE-pk/LTE-pokemon-main/database/Pokemon.csv')
     
     # Garantir que dados é um DataFrame
     dados = pd.DataFrame(dados)
