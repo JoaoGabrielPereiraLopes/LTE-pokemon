@@ -38,10 +38,10 @@ class Pokemon:
 
 def registra_pk():
     # Carregar o arquivo CSV
-    dados = pd.read_csv('C:/Users/Asafe/Documents/LTE-pk/LTE-pokemon-main/database/Pokemon.csv')
+    dados = pd.read_csv('C:/Users/gabri/Downloads/LTE-POKEMON-main/database/Pokemon.csv')
 
     # Filtrar os dados onde o nome contém 'Mega' (ignorando maiúsculas/minúsculas)
-    dados_mega = dados[~dados['Name'].str.contains('Mega', case=False, na=False)]
+    dados_mega = dados[~dados['Name'].str.contains('Mega ', case=False, na=False)]
 
     # Para cada linha do DataFrame filtrado, crie um dicionário e registre no banco de dados
     for _, linha in dados_mega.iterrows():

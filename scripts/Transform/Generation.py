@@ -28,7 +28,7 @@ class Generation:
 
 def registrador():
     # Carregar os dados do arquivo CSV
-    dados = pd.read_csv('C:/Users/Asafe/Documents/LTE-pk/LTE-pokemon-main/database/Pokemon.csv')
+    dados = pd.read_csv('C:/Users/gabri/Downloads/LTE-POKEMON-main/database/Pokemon.csv')
     generations = dados['Generation'].unique()  # Gera uma lista das gerações únicas
 
     for x in range(1,len(generations)+1):

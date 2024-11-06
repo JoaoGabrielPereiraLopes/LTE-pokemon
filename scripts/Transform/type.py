@@ -25,7 +25,7 @@ class Type:
 def registrador():
     
     # Ler o arquivo CSV com pandas
-    dados = pd.read_csv('C:/Users/Asafe/Documents/LTE-pk/LTE-pokemon-main/database/Pokemon.csv')
+    dados = pd.read_csv('C:/Users/gabri/Downloads/LTE-POKEMON-main/database/Pokemon.csv')
     
     # Garantir que dados é um DataFrame
     dados = pd.DataFrame(dados)
