@@ -54,26 +54,28 @@ pk.loc[pk['Type 2'].isna(), 'Type 2'] = ''
 pk1 = pk[~pk['Name'].str.contains('Mega ', case=False, na=False)]
 
 # Selecionando as colunas que você quer
-pk1 = pk1[['Name', 'Type 1','Type 2','Total','HP','Attack','Defense','Sp. Atk','Sp. Def','Speed','Generation','Legendary']]
+pk1 = pk1[['Name', 'Type 1', 'Type 2', 'Total', 'HP', 'Attack', 'Defense', 'Sp. Atk', 'Sp. Def', 'Speed', 'Generation', 'Legendary']]
 
 # Resetando o índice e renomeando a coluna de índice
 pk1.reset_index(inplace=True)
 pk1.rename(columns={'index': 'id'}, inplace=True)
 
-# Salvando o DataFrame final na tabela 'pokemon' (não 'generation' como antes)
+# Atualizando a coluna 'Generation' no DataFrame pk1 com os IDs correspondentes
+for index, row in generation.iterrows():
+    pk1.loc[pk1['Generation'] == row['Generation'], 'Generation'] = row['id']
+
+# Salvando o DataFrame final na tabela 'pokemon'
 pk1.to_sql('pokemon', conexao, if_exists='replace', index=False)
 
 # Filtrando Pokémon Mega
 pk2 = pk[pk['Name'].str.contains('Mega ')]
-pk2.drop(columns=['Generation', 'Legendary',], inplace=True)
+pk2.drop(columns=['Generation', 'Legendary'], inplace=True)
 
 # Consulta para pegar os ids dos Pokémon
 consulta = '''SELECT id, Name FROM pokemon;'''
 ids = pd.read_sql_query(consulta, conexao)
 
 # Atualizando as Mega Evoluções
-# Atualizando as Mega Evoluções
-
 for index, row in pk2.iterrows():
     mega_name = row['Name']
     original_name = mega_name.split(' ')[1]  # Pegando o nome do Pokémon original
@@ -85,8 +87,6 @@ for index, row in pk2.iterrows():
 
     pk2.at[index, 'Name'] = new_name  # Atualizando o nome no DataFrame
     pk2.at[index, 'original'] = original_id  # Associando o id do Pokémon original
-
-print(pk2)
 
 # Salvando as Mega Evoluções no banco
 pk2.to_sql('Mega', conexao, if_exists='replace', index=False)
