@@ -52,7 +52,7 @@ pk.loc[pk['Type 2'].isna(), 'Type 2'] = ''
 
 # Remover Pokémon com nome que contém "Mega"
 pk1 = pk[~pk['Name'].str.contains('Mega ', case=False, na=False)]
-pk1 = pk[~pk['Name'].str.contains('Primal', case=False, na=False)]
+pk1 = pk1[~pk1['Name'].str.contains('Primal', case=False, na=False)]
 
 # Selecionando as colunas que você quer
 pk1 = pk1[['Name', 'Type 1', 'Type 2', 'Total', 'HP', 'Attack', 'Defense', 'Sp. Atk', 'Sp. Def', 'Speed', 'Generation', 'Legendary']]
@@ -69,25 +69,36 @@ for index, row in generation.iterrows():
 pk1.to_sql('pokemon', conexao, if_exists='replace', index=False)
 
 # Filtrando Pokémon Mega
-pk2 = pk[pk['Name'].str.contains('Mega ')]
+pk2 = pk[pk['Name'].str.contains('Mega |Primal', case=False, na=False)]
 pk2.drop(columns=['Generation', 'Legendary'], inplace=True)
-
 # Consulta para pegar os ids dos Pokémon
 consulta = '''SELECT id, Name FROM pokemon;'''
 ids = pd.read_sql_query(consulta, conexao)
-
+pk2.rename(columns={'#': 'id'}, inplace=True)
 # Atualizando as Mega Evoluções
+original_id=[]
+ids=[]
 for index, row in pk2.iterrows():
     mega_name = row['Name']
-    original_name = mega_name.split(' ')[1]  # Pegando o nome do Pokémon original
-    # Buscando o id do Pokémon original
-    original_id = int(pk1[pk1['Name'] == original_name]['id'].iloc[0])
+    ids.append(index)
+    # Tentando pegar o nome original, caso seja composto por mais de uma palavra
+    original_name=mega_name.replace(mega_name.split(' ')[1]+' ',' ')
+    original_name = mega_name.split(' ')[0]  # Assume que o segundo termo é o nome original
+    if len(mega_name.split(' ')) > 2:
+        original_name += ' ' + mega_name.split(' ')[2]  # Se houver um terceiro termo, adiciona ao nome original
     
-
-    pk2.at[index, 'Name'] = original_name  # Atualizando o nome no DataFrame
-    pk2.at[index, 'original'] = original_id  # Associando o id do Pokémon original
-
+    # Buscando o id do Pokémon original
+    try:
+        original_id.append(int(pk[pk['Name'] == mega_name]['#'].iloc[0]))
+    except IndexError:
+        print(f"Pokémon original '{mega_name}' não encontrado no DataFrame pk1")
+        continue  # Pula para a próxima iteração se o Pokémon original não for encontrado
+    # Atualizando o DataFrame pk2: alterando o nome e adicionando o ID original
+    pk2.loc[pk2['Name'] == mega_name, 'Name'] = original_name
+print(ids)
+pk2['original'],pk2['id']=original_id,ids    
 # Salvando as Mega Evoluções no banco
+
 pk2.to_sql('Mega', conexao, if_exists='replace', index=False)
 
 # Fechando a conexão com o banco de dados
