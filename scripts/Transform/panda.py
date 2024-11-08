@@ -62,10 +62,13 @@ pk1.reset_index(inplace=True)
 pk1.rename(columns={'index': 'id'}, inplace=True)
 
 # Atualizando a coluna 'Generation' no DataFrame pk1 com os IDs correspondentes
+contagem=0
 for index, row in generation.iterrows():
     pk1.loc[pk1['Generation'] == row['Generation'], 'Generation'] = row['id']
-
+    contagem+=1
 # Salvando o DataFrame final na tabela 'pokemon'
+id_list=[int(x) for x in range(len(pk1))]
+pk1['id']=id_list
 pk1.to_sql('pokemon', conexao, if_exists='replace', index=False)
 
 # Filtrando Pokémon Mega
@@ -78,9 +81,10 @@ pk2.rename(columns={'#': 'id'}, inplace=True)
 # Atualizando as Mega Evoluções
 original_id=[]
 ids=[]
+contagem=0
 for index, row in pk2.iterrows():
     mega_name = row['Name']
-    ids.append(index)
+    ids.append(contagem)
     # Tentando pegar o nome original, caso seja composto por mais de uma palavra
     original_name=mega_name.replace(mega_name.split(' ')[1]+' ',' ')
     original_name = mega_name.split(' ')[0]  # Assume que o segundo termo é o nome original
@@ -95,7 +99,7 @@ for index, row in pk2.iterrows():
         continue  # Pula para a próxima iteração se o Pokémon original não for encontrado
     # Atualizando o DataFrame pk2: alterando o nome e adicionando o ID original
     pk2.loc[pk2['Name'] == mega_name, 'Name'] = original_name
-print(ids)
+    contagem+=1
 pk2['original'],pk2['id']=original_id,ids    
 # Salvando as Mega Evoluções no banco
 
